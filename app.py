@@ -46,10 +46,10 @@ html, body, [class*="css"] { font-family: 'Noto Sans KR','Malgun Gothic',sans-se
 .fac-c { font-size:14px; color:#1a1a2e; }
 .badge { font-size:12px; font-weight:700; border-radius:6px; padding:3px 10px; white-space:nowrap; }
 .anchor { scroll-margin-top: 20px; }
-a.navlink { display:block; padding:8px 12px; margin:4px 0; border-radius:8px; background:#f2f5fa;
-  color:#2E68B0; text-decoration:none; font-size:14px; font-weight:600; border:1px solid #e3e9f2; }
-a.navlink:hover { background:#e3ecf8; color:#163E78; }
-a.navlink.navsub { margin:3px 0 3px 10px; font-size:12px; padding:6px 10px; font-weight:500; background:#f7f9fc; }
+.navgroup { font-size:13px; font-weight:700; color:#1a1a2e; margin:14px 0 4px; }
+.navgroup.first { margin-top:0; }
+a.tocsub { display:block; padding:3px 0 3px 14px; color:#2E68B0; font-size:14px; text-decoration:underline; }
+a.tocsub:hover { color:#163E78; }
 table.tree { border-collapse:collapse; width:100%; background:#fff; }
 table.tree th { background:#eef1f6; color:#55606f; font-size:12px; font-weight:700; padding:8px;
   border:1px solid #e3e9f2; text-align:center; }
@@ -206,9 +206,13 @@ def render_evidence(f):
 # ── 사이드바: 목차 ──────────────────────────────────────────
 with st.sidebar:
     st.markdown("### 목차")
-    toc = ['<a class="navlink" href="#status">점검 현황</a>',
-           '<a class="navlink" href="#factors">요인별 점검</a>',
-           '<a class="navlink" href="#map">동인맵 (결론)</a>']
+    toc = [
+        '<div class="navgroup first">진단</div>',
+        '<a class="tocsub" href="#status">1) 점검 현황</a>',
+        '<a class="tocsub" href="#factors">2) 요인별 점검</a>',
+        '<div class="navgroup">결론·실행</div>',
+        '<a class="tocsub" href="#map">3) 동인맵</a>',
+    ]
     st.markdown("\n".join(toc), unsafe_allow_html=True)
     st.markdown("---")
     st.caption(
