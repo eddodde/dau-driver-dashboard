@@ -207,10 +207,8 @@ def render_evidence(f):
 with st.sidebar:
     st.markdown("### 목차")
     toc = ['<a class="navlink" href="#status">점검 현황</a>',
-           '<a class="navlink" href="#factors">요인별 점검</a>']
-    for _, f in factors.iterrows():
-        toc.append(f'<a class="navlink navsub" href="#f{f["num"]}">{f["num"]}. {f["factor"]}</a>')
-    toc.append('<a class="navlink" href="#map">동인맵 (결론)</a>')
+           '<a class="navlink" href="#factors">요인별 점검</a>',
+           '<a class="navlink" href="#map">동인맵 (결론)</a>']
     st.markdown("\n".join(toc), unsafe_allow_html=True)
     st.markdown("---")
     st.caption(
