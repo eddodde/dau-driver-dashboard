@@ -35,8 +35,8 @@ st.markdown(
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
 html, body, [class*="css"] { font-family: 'Noto Sans KR','Malgun Gothic',sans-serif; }
 .hdr { font-size: 26px; font-weight: 700; color:#1a1a2e; margin-bottom: 2px; }
-.section-title { font-size:18px; font-weight:700; color:#1a1a2e; margin:22px 0 10px;
-  padding-bottom:6px; border-bottom:2px solid #e9ecef; }
+.section-title { font-size:18px; font-weight:700; color:#1a1a2e; margin:24px 0 10px;
+  padding-bottom:6px; border-bottom:2px solid #e9ecef; scroll-margin-top:20px; }
 .metric-card { background:#f8f9fa; border-radius:10px; padding:12px 16px; border-left:4px solid #4C72B0; }
 .metric-label { font-size:13px; color:#666; margin-bottom:4px; }
 .metric-value { font-size:24px; font-weight:700; color:#1a1a2e; }
@@ -45,6 +45,11 @@ html, body, [class*="css"] { font-family: 'Noto Sans KR','Malgun Gothic',sans-se
 .fac-q { font-size:12px; color:#888; margin:2px 0 6px; }
 .fac-c { font-size:14px; color:#1a1a2e; }
 .badge { font-size:12px; font-weight:700; border-radius:6px; padding:3px 10px; white-space:nowrap; }
+.anchor { scroll-margin-top: 20px; }
+a.navlink { display:block; padding:8px 12px; margin:4px 0; border-radius:8px; background:#f2f5fa;
+  color:#2E68B0; text-decoration:none; font-size:14px; font-weight:600; border:1px solid #e3e9f2; }
+a.navlink:hover { background:#e3ecf8; color:#163E78; }
+a.navlink.navsub { margin:3px 0 3px 10px; font-size:12px; padding:6px 10px; font-weight:500; background:#f7f9fc; }
 table.tree { border-collapse:collapse; width:100%; background:#fff; }
 table.tree th { background:#eef1f6; color:#55606f; font-size:12px; font-weight:700; padding:8px;
   border:1px solid #e3e9f2; text-align:center; }
@@ -87,6 +92,10 @@ def metric(col, label, value, sub, color):
         f'<div class="metric-sub">{sub}</div></div>',
         unsafe_allow_html=True,
     )
+
+
+def title(text, anchor):
+    st.markdown(f'<div class="section-title" id="{anchor}">{text}</div>', unsafe_allow_html=True)
 
 
 def base_layout(fig, h=280):
@@ -194,10 +203,15 @@ def render_evidence(f):
         st.caption("정량 근거 없음 — CRM 통제 밖으로 분석 범위에서 제외.")
 
 
-# ── 사이드바 ────────────────────────────────────────────────
+# ── 사이드바: 목차 ──────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### 뷰")
-    view = st.radio("view", ["요인 점검 (진단)", "동인맵 (결론)"], label_visibility="collapsed")
+    st.markdown("### 목차")
+    toc = ['<a class="navlink" href="#status">점검 현황</a>',
+           '<a class="navlink" href="#factors">요인별 점검</a>']
+    for _, f in factors.iterrows():
+        toc.append(f'<a class="navlink navsub" href="#f{f["num"]}">{f["num"]}. {f["factor"]}</a>')
+    toc.append('<a class="navlink" href="#map">동인맵 (결론)</a>')
+    st.markdown("\n".join(toc), unsafe_allow_html=True)
     st.markdown("---")
     st.caption(
         "**워싱**: 모든 숫자는 `data/*.csv`에서 로드. 기준 통일·마스킹은 CSV만 수정.\n\n"
@@ -208,53 +222,47 @@ st.markdown('<div class="hdr">VIP DAU 진단 · 동인맵</div>', unsafe_allow_h
 st.caption("하락 현상을 요인별로 점검(진단) → 통제 가능한 실행으로 수렴(동인맵) | "
            "수치는 전년비·구성비, 절대수 비노출")
 
-# ── 뷰 1. 요인 점검 (진단) ───────────────────────────────────
-if view.startswith("요인"):
-    st.markdown('<div class="section-title">점검 현황</div>', unsafe_allow_html=True)
-    counts = factors["verdict"].value_counts()
-    cols = st.columns(4)
-    for col, label in zip(cols, ["제외", "유효", "부분 유효", "범위 제외"]):
-        metric(col, label, f"{int(counts.get(label, 0))}건", "", VERDICT[label])
+# ── 점검 현황 ───────────────────────────────────────────────
+title("점검 현황", "status")
+counts = factors["verdict"].value_counts()
+cols = st.columns(4)
+for col, label in zip(cols, ["제외", "유효", "부분 유효", "범위 제외"]):
+    metric(col, label, f"{int(counts.get(label, 0))}건", "", VERDICT[label])
 
-    st.markdown('<div class="section-title">요인별 점검</div>', unsafe_allow_html=True)
-    st.caption("각 후보 요인을 데이터로 확인하고 제외/유효를 판정. '근거 데이터'를 펼쳐 확인.")
+# ── 요인별 점검 ─────────────────────────────────────────────
+title("요인별 점검", "factors")
+st.caption("각 후보 요인을 데이터로 확인하고 제외/유효를 판정. '근거 데이터'를 펼쳐 확인.")
 
-    for _, f in factors.iterrows():
-        with st.container(border=True):
-            color = VERDICT.get(f["verdict"], "#7f8c8d")
-            st.markdown(
-                f'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">'
-                f'<div style="font-size:15px;font-weight:700;color:#1a1a2e">{f["num"]}. {f["factor"]}</div>'
-                f'<span class="badge" style="background:{color}22;color:{color}">{f["verdict"]}</span></div>'
-                f'<div class="fac-q">{f["question"]}</div>'
-                f'<div class="fac-c">{f["conclusion"]}</div>',
-                unsafe_allow_html=True,
-            )
-            with st.expander("근거 데이터 보기"):
-                render_evidence(f)
+for _, f in factors.iterrows():
+    st.markdown(f'<div class="anchor" id="f{f["num"]}"></div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        color = VERDICT.get(f["verdict"], "#7f8c8d")
+        st.markdown(
+            f'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">'
+            f'<div style="font-size:15px;font-weight:700;color:#1a1a2e">{f["num"]}. {f["factor"]}</div>'
+            f'<span class="badge" style="background:{color}22;color:{color}">{f["verdict"]}</span></div>'
+            f'<div class="fac-q">{f["question"]}</div>'
+            f'<div class="fac-c">{f["conclusion"]}</div>',
+            unsafe_allow_html=True,
+        )
+        with st.expander("근거 데이터 보기"):
+            render_evidence(f)
 
-    st.markdown("---")
-    st.caption("→ 잔여 유효 요인이 CRM 즉시 통제 가능·레버리지 큰 '단일 실행축'으로 수렴. "
-               "실행 구조는 '동인맵' 뷰 참고.")
+# ── 동인맵 (결론) ───────────────────────────────────────────
+title("동인맵 (결론)", "map")
+st.markdown('<span class="sub">VIP DAU = 방문 모수 × 인당 방문빈도 · '
+            'CRM 통제 가능(teal) / CRM 밖(gray)</span>', unsafe_allow_html=True)
+st.markdown(render_tree(nodes), unsafe_allow_html=True)
 
-# ── 뷰 2. 동인맵 (결론) ──────────────────────────────────────
-else:
-    st.markdown('<div class="section-title">성과 동인맵</div>', unsafe_allow_html=True)
-    st.markdown('<span class="sub">VIP DAU = 방문 모수 × 인당 방문빈도 · '
-                'CRM 통제 가능(teal) / CRM 밖(gray)</span>', unsafe_allow_html=True)
-    st.markdown(render_tree(nodes), unsafe_allow_html=True)
+last = kpi.iloc[-1]
+c1, c2, c3 = st.columns(3)
+metric(c1, f"MAU 전년비 ({last['month']})", f"{last['mau_yoy']:+.1f}%", "모수는 유지·증가", "#55A868")
+metric(c2, f"DAU 전년비 ({last['month']})", f"{last['dau_yoy']:+.1f}%", "방문 빈도 역신장", "#C44E52")
+metric(c3, "MAU − DAU 갭", f"{last['mau_yoy'] - last['dau_yoy']:+.1f}%p", "모수 아닌 '빈도' 문제", "#4C72B0")
 
-    st.markdown('<div class="section-title">MAU vs DAU 전년비</div>', unsafe_allow_html=True)
-    last = kpi.iloc[-1]
-    c1, c2, c3 = st.columns(3)
-    metric(c1, f"MAU 전년비 ({last['month']})", f"{last['mau_yoy']:+.1f}%", "모수는 유지·증가", "#55A868")
-    metric(c2, f"DAU 전년비 ({last['month']})", f"{last['dau_yoy']:+.1f}%", "방문 빈도 역신장", "#C44E52")
-    metric(c3, "MAU − DAU 갭", f"{last['mau_yoy'] - last['dau_yoy']:+.1f}%p", "모수 아닌 '빈도' 문제", "#4C72B0")
-    st.plotly_chart(fig_kpi(), use_container_width=True, key="concl_kpi")
-
-    st.markdown('<div class="note">채널 분해: 광고 <b>flat</b> · 하락 전액 '
-                '<b style="color:#C44E52">직접 −10% · 푸시 −14%</b>(재방문 채널) '
-                '→ 하락은 <b>인당 빈도(재방문) 축</b>에서 발생.</div>', unsafe_allow_html=True)
+st.markdown('<div class="note">채널 분해: 광고 <b>flat</b> · 하락 전액 '
+            '<b style="color:#C44E52">직접 −10% · 푸시 −14%</b>(재방문 채널) '
+            '→ 하락은 <b>인당 빈도(재방문) 축</b>에서 발생.</div>', unsafe_allow_html=True)
 
 st.markdown("---")
 st.caption("데이터: `data/*.csv` · 수치는 전년비·구성비(절대수 비노출) · "
