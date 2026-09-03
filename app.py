@@ -203,7 +203,8 @@ def render_evidence(f):
             st.markdown('<span class="sub">전이행렬 (행 합계 100%)</span>', unsafe_allow_html=True)
             st.markdown(html_transition(), unsafe_allow_html=True)
     elif ev == "stat":
-        metric(st.columns(2)[0], f["stat_label"], f["stat_value"], "전년 대비 변화 미미", "#9aa0a6")
+        color = VERDICT.get(f["verdict"], "#9aa0a6")
+        metric(st.columns(2)[0], f["stat_label"], f["stat_value"], "", color)
     else:
         st.caption("정량 근거 없음 — CRM 통제 밖으로 분석 범위에서 제외.")
 
