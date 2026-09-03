@@ -202,9 +202,18 @@ def render_evidence(f):
         with b:
             st.markdown('<span class="sub">전이행렬 (행 합계 100%)</span>', unsafe_allow_html=True)
             st.markdown(html_transition(), unsafe_allow_html=True)
-    elif ev == "stat":
-        color = VERDICT.get(f["verdict"], "#9aa0a6")
-        metric(st.columns(2)[0], f["stat_label"], f["stat_value"], "", color)
+    elif ev == "compare":
+        unit = f["cmp_unit"] if isinstance(f["cmp_unit"], str) else ""
+        v25, v26 = float(f["cmp_2025"]), float(f["cmp_2026"])
+        delta = v26 - v25
+        st.markdown(f'<span class="sub">{f["cmp_label"]} · 전년비 {delta:+.1f}{unit or "p"}</span>',
+                    unsafe_allow_html=True)
+        figc = go.Figure(go.Bar(x=["2025", "2026"], y=[v25, v26],
+                                marker_color=["#B0C4DE", "#4C72B0"], width=0.5,
+                                text=[f"{v25:g}{unit}", f"{v26:g}{unit}"], textposition="outside"))
+        base_layout(figc, 260)
+        figc.update_yaxes(ticksuffix=unit)
+        st.plotly_chart(figc, use_container_width=True, key=f"cmp_{f['num']}")
     else:
         st.caption("정량 근거 없음 — CRM 통제 밖으로 분석 범위에서 제외.")
 
