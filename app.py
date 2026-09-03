@@ -15,7 +15,6 @@ DATA = pathlib.Path(__file__).parent / "data"
 KFONT = "'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif"
 
 
-@st.cache_data
 def load(name, fill=False):
     df = pd.read_csv(DATA / name)
     return df.fillna("") if fill else df
