@@ -44,6 +44,12 @@ html, body, [class*="css"] { font-family: 'Noto Sans KR','Malgun Gothic',sans-se
 .fac-q { font-size:12px; color:#888; margin:2px 0 6px; }
 .fac-c { font-size:14px; color:#1a1a2e; }
 .badge { font-size:12px; font-weight:700; border-radius:6px; padding:3px 10px; white-space:nowrap; }
+table.stbl { border-collapse:collapse; width:100%; background:#fff; }
+table.stbl th { background:#eef1f6; color:#55606f; font-size:12px; font-weight:700; padding:8px 10px;
+  border:1px solid #e3e9f2; text-align:left; }
+table.stbl td { border:1px solid #e3e9f2; padding:8px 10px; font-size:13px; color:#1a1a2e; vertical-align:middle; }
+table.stbl td.fn { font-weight:700; white-space:nowrap; }
+table.stbl td.fc { color:#444; }
 .anchor { scroll-margin-top: 20px; }
 .navgroup { font-size:13px; font-weight:700; color:#1a1a2e; margin:14px 0 4px; }
 .navgroup.first { margin-top:0; }
@@ -232,22 +238,32 @@ for col, label in zip(cols, ["제외", "유효", "부분 유효", "범위 제외
 
 # ── 요인별 점검 ─────────────────────────────────────────────
 title("요인별 점검", "factors")
-st.caption("각 후보 요인을 데이터로 확인하고 제외/유효를 판정. '근거 데이터'를 펼쳐 확인.")
+st.caption("후보 요인 전체 판정을 한눈에 확인하고, 아래에서 하나를 골라 근거 데이터를 확인.")
 
-for _, f in factors.iterrows():
-    st.markdown(f'<div class="anchor" id="f{f["num"]}"></div>', unsafe_allow_html=True)
-    with st.container(border=True):
-        color = VERDICT.get(f["verdict"], "#7f8c8d")
-        st.markdown(
-            f'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">'
-            f'<div style="font-size:15px;font-weight:700;color:#1a1a2e">{f["num"]}. {f["factor"]}</div>'
-            f'<span class="badge" style="background:{color}22;color:{color}">{f["verdict"]}</span></div>'
-            f'<div class="fac-q">{f["question"]}</div>'
-            f'<div class="fac-c">{f["conclusion"]}</div>',
-            unsafe_allow_html=True,
-        )
-        with st.expander("근거 데이터 보기"):
-            render_evidence(f)
+srows = []
+for r in factors.itertuples():
+    color = VERDICT.get(r.verdict, "#7f8c8d")
+    srows.append(
+        f'<tr><td class="fn">{r.num}. {r.factor}</td>'
+        f'<td><span class="badge" style="background:{color}22;color:{color}">{r.verdict}</span></td>'
+        f'<td class="fc">{r.conclusion}</td></tr>'
+    )
+st.markdown('<table class="stbl"><tr><th>요인</th><th>판정</th><th>결론</th></tr>'
+            + "".join(srows) + "</table>", unsafe_allow_html=True)
+
+st.markdown('<div style="height:14px"></div>', unsafe_allow_html=True)
+labels = [f"{r.num}. {r.factor}" for r in factors.itertuples()]
+sel = st.selectbox("요인 골라서 근거 데이터 보기", labels)
+f = factors.iloc[labels.index(sel)]
+color = VERDICT.get(f["verdict"], "#7f8c8d")
+with st.container(border=True):
+    st.markdown(
+        f'<span class="badge" style="background:{color}22;color:{color}">{f["verdict"]}</span> '
+        f'<span class="fac-q" style="margin-left:6px">{f["question"]}</span>'
+        f'<div class="fac-c" style="margin-top:6px">{f["conclusion"]}</div>',
+        unsafe_allow_html=True,
+    )
+    render_evidence(f)
 
 # ── 동인맵 (결론) ───────────────────────────────────────────
 title("동인맵 (결론)", "map")
