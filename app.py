@@ -206,14 +206,18 @@ def render_evidence(f):
         unit = f["cmp_unit"] if isinstance(f["cmp_unit"], str) else ""
         v25, v26 = float(f["cmp_2025"]), float(f["cmp_2026"])
         delta = v26 - v25
-        st.markdown(f'<span class="sub">{f["cmp_label"]} · 전년비 {delta:+.1f}{unit or "p"}</span>',
-                    unsafe_allow_html=True)
-        figc = go.Figure(go.Bar(x=["2025", "2026"], y=[v25, v26],
-                                marker_color=["#B0C4DE", "#4C72B0"], width=0.5,
-                                text=[f"{v25:g}{unit}", f"{v26:g}{unit}"], textposition="outside"))
-        base_layout(figc, 260)
-        figc.update_yaxes(ticksuffix=unit)
-        st.plotly_chart(figc, use_container_width=True, key=f"cmp_{f['num']}")
+        dsuf = "%p" if unit == "%" else unit
+        dcolor = "#9aa0a6" if abs(delta) < 1 else ("#C44E52" if delta < 0 else "#55A868")
+        st.markdown(
+            '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;'
+            'background:#f8f9fa;border-radius:10px;padding:12px 16px">'
+            f'<span style="font-size:13px;color:#666">{f["cmp_label"]}</span>'
+            f'<span style="font-size:20px;font-weight:700;color:#1a1a2e">'
+            f'{v25:g}{unit} <span style="color:#bbb">→</span> {v26:g}{unit}</span>'
+            f'<span class="badge" style="background:{dcolor}22;color:{dcolor}">'
+            f'전년비 {delta:+.1f}{dsuf}</span></div>',
+            unsafe_allow_html=True,
+        )
     else:
         st.caption("정량 근거 없음 — CRM 통제 밖으로 분석 범위에서 제외.")
 
