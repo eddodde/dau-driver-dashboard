@@ -119,9 +119,6 @@ with st.sidebar:
         '<a href="#map" class="navlink">3 · 동인맵 · 실행</a>',
         unsafe_allow_html=True,
     )
-    src_txt = "업로드 CSV" if uploaded else "커밋된 data/*.csv"
-    st.caption(f"데이터 출처: **{src_txt}**")
-    st.caption("수치는 전년비·구성비 · 절대수 비노출")
 
 
 def base_layout(fig, h=280):
