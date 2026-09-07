@@ -110,8 +110,7 @@ freq = load("frequency.csv")
 trans = load("transition.csv")
 daytype = load("daytype.csv")
 
-# ── 사이드바 ②: 메뉴 + 기간 ─────────────────────────────────
-YMS = [str(m) for m in kpi["month"]]
+# ── 사이드바 ②: 메뉴 ────────────────────────────────────────
 with st.sidebar:
     st.markdown("#### 📂 메뉴")
     st.markdown(
@@ -120,17 +119,9 @@ with st.sidebar:
         '<a href="#map" class="navlink">3 · 동인맵 · 실행</a>',
         unsafe_allow_html=True,
     )
-    st.markdown("#### 🔎 기간")
-    if len(YMS) >= 2:
-        ym0, ym1 = st.select_slider("기간(월)", options=YMS, value=(YMS[0], YMS[-1]),
-                                    format_func=lambda m: m[2:], key=f"period_{YMS[0]}_{YMS[-1]}")
-    else:
-        ym0, ym1 = (YMS[0], YMS[-1]) if YMS else ("", "")
     src_txt = "업로드 CSV" if uploaded else "커밋된 data/*.csv"
-    st.caption(f"데이터 출처: **{src_txt}** · {len(YMS)}개월")
+    st.caption(f"데이터 출처: **{src_txt}**")
     st.caption("수치는 전년비·구성비 · 절대수 비노출")
-
-kpi_view = kpi[(kpi["month"] >= ym0) & (kpi["month"] <= ym1)] if ym0 else kpi
 
 
 def base_layout(fig, h=280):
@@ -142,7 +133,7 @@ def base_layout(fig, h=280):
 
 
 def fig_kpi():
-    d = kpi_view if len(kpi_view) else kpi
+    d = kpi
     f = go.Figure()
     f.add_trace(go.Scatter(x=d["month"], y=d["mau_yoy"], name="MAU 전년비",
                            mode="lines+markers", line=dict(color="#55A868", width=3)))
@@ -254,12 +245,11 @@ def render_evidence(f):
 
 
 st.markdown('<div class="hdr">VIP DAU 보고</div>', unsafe_allow_html=True)
-lab = f"{ym0[2:]} ~ {ym1[2:]}" if ym0 else "-"
-st.caption(f"현황 → 요인 점검 → 동인맵·실행  |  기간 {lab} · 수치는 전년비·구성비, 절대수 비노출")
+st.caption("현황 → 요인 점검 → 동인맵·실행  |  수치는 전년비·구성비, 절대수 비노출")
 
 # ── 1. 현황 ─────────────────────────────────────────────────
 title("1. 현황", "now")
-last = (kpi_view if len(kpi_view) else kpi).iloc[-1]
+last = kpi.iloc[-1]
 c1, c2, c3 = st.columns(3)
 metric(c1, f"DAU 전년비 ({last['month']})", f"{last['dau_yoy']:+.1f}%", "방문 빈도 역신장", "#C44E52")
 metric(c2, f"MAU 전년비 ({last['month']})", f"{last['mau_yoy']:+.1f}%", "모수는 유지·증가", "#55A868")
