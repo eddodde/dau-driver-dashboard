@@ -85,21 +85,38 @@ def title(text, anchor):
 
 
 # ── 사이드바 ①: 설정 (원본 올리기) ──────────────────────────
+def _read_uploads(files):
+    out = {}
+    for fobj in files or []:
+        nm = fobj.name
+        if nm.lower().endswith(".xlsx"):
+            sheets = pd.read_excel(fobj, sheet_name=None)
+            for sh, df in sheets.items():
+                out[str(sh).strip().lower()] = df
+            if len(sheets) == 1:
+                out[pathlib.Path(nm).stem.lower()] = list(sheets.values())[0]
+        else:
+            out[pathlib.Path(nm).stem.lower()] = pd.read_csv(fobj)
+    return out
+
+
 with st.sidebar:
     st.header("⚙️ 설정")
     with st.expander("📤 원본 올리기 (월 갱신)", expanded=False):
-        st.caption("갱신할 CSV를 **파일명 그대로** 올리면 git push 없이 즉시 반영됩니다. "
-                   "(kpi · channel · frequency · transition · nodes · factors · daytype .csv)")
-        _ups = st.file_uploader("CSV 올리기", type="csv", accept_multiple_files=True,
-                                label_visibility="collapsed", key="up")
-    uploaded = {u.name: u for u in (_ups or [])}
-    if uploaded:
-        st.success("업로드 반영: " + ", ".join(uploaded.keys()))
+        st.caption("**CSV 또는 엑셀(xlsx)**을 올리면 git push 없이 즉시 반영됩니다.  "
+                   "CSV는 **파일명**, 엑셀은 **시트명**을 데이터명으로 맞춰주세요 "
+                   "(kpi · channel · frequency · transition · nodes · factors · daytype). "
+                   "엑셀은 한 파일에 여러 시트로 넣어도 됩니다.")
+        _ups = st.file_uploader("CSV / 엑셀 올리기", type=["csv", "xlsx"],
+                                accept_multiple_files=True, label_visibility="collapsed", key="up")
+    uploaded_dfs = _read_uploads(_ups)
+    if uploaded_dfs:
+        st.success("업로드 반영: " + ", ".join(sorted(uploaded_dfs)))
 
 
 def load(name, fill=False):
-    src = uploaded[name] if name in uploaded else (DATA / name)
-    df = pd.read_csv(src)
+    stem = pathlib.Path(name).stem.lower()
+    df = uploaded_dfs[stem].copy() if stem in uploaded_dfs else pd.read_csv(DATA / name)
     return df.fillna("") if fill else df
 
 
