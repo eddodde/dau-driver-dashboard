@@ -170,22 +170,16 @@ def fig_kpi():
     return base_layout(f, ttl="MAU vs DAU 전년비 추이")
 
 
-def fig_kpi_level():
+def fig_level(col, ttl, color):
     d = kpi_level
     xlab = [str(m)[2:] for m in d["month"]]
-    f = go.Figure()
-    f.add_trace(go.Scatter(x=xlab, y=d["mau"], name="MAU (좌)", mode="lines+markers",
-                           line=dict(color="#55A868", width=3)))
-    f.add_trace(go.Scatter(x=xlab, y=d["dau"], name="DAU (우)", mode="lines+markers",
-                           line=dict(color="#C44E52", width=3), yaxis="y2"))
-    f.update_layout(height=300, margin=dict(l=10, r=10, t=36, b=34),
-                    font=dict(family=KFONT), plot_bgcolor="white",
-                    legend=dict(orientation="h", y=-0.2, x=0),
+    f = go.Figure(go.Scatter(x=xlab, y=d[col], mode="lines+markers",
+                             line=dict(color=color, width=3)))
+    f.update_layout(height=260, margin=dict(l=10, r=10, t=36, b=10),
+                    font=dict(family=KFONT), plot_bgcolor="white", showlegend=False,
                     xaxis=dict(type="category"),
-                    yaxis=dict(title="MAU", gridcolor="#eee"),
-                    yaxis2=dict(title="DAU", overlaying="y", side="right", showgrid=False),
-                    title=dict(text="MAU · DAU 실제 지표 추이", x=0.5, xanchor="center",
-                               y=0.98, yanchor="top",
+                    yaxis=dict(gridcolor="#eee", tickformat=",d"),
+                    title=dict(text=ttl, x=0.5, xanchor="center", y=0.98, yanchor="top",
                                font=dict(family=KFONT, size=13, color="#1a2236")))
     return f
 
@@ -263,7 +257,13 @@ def render_evidence(f):
         st.plotly_chart(fig_kpi(), use_container_width=True, key=key)
     elif ev == "kpi_level":
         if kpi_level is not None:
-            st.plotly_chart(fig_kpi_level(), use_container_width=True, key=key)
+            a, b = st.columns(2)
+            with a:
+                st.plotly_chart(fig_level("mau", "MAU (월 방문자)", "#55A868"),
+                                use_container_width=True, key=key + "_m")
+            with b:
+                st.plotly_chart(fig_level("dau", "DAU (일 방문자)", "#C44E52"),
+                                use_container_width=True, key=key + "_d")
         else:
             st.plotly_chart(fig_kpi(), use_container_width=True, key=key)
     elif ev == "daytype":
