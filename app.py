@@ -15,8 +15,19 @@ DATA = pathlib.Path(__file__).parent / "data"
 KFONT = "'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif"
 
 
+with st.sidebar:
+    with st.expander("📁 데이터 업데이트 (CSV 업로드)"):
+        st.caption("갱신할 파일을 **파일명 그대로** 올리면 화면이 그 데이터로 바뀝니다. "
+                   "(kpi.csv · channel.csv · frequency.csv · transition.csv · nodes.csv · factors.csv · daytype.csv)")
+        _ups = st.file_uploader("CSV 올리기", type="csv", accept_multiple_files=True,
+                                label_visibility="collapsed")
+    uploaded = {u.name: u for u in (_ups or [])}
+    if uploaded:
+        st.success("업로드 반영: " + ", ".join(uploaded.keys()))
+
 def load(name, fill=False):
-    df = pd.read_csv(DATA / name)
+    src = uploaded[name] if name in uploaded else (DATA / name)
+    df = pd.read_csv(src)
     return df.fillna("") if fill else df
 
 
