@@ -127,6 +127,10 @@ channel = load("channel.csv")
 freq = load("frequency.csv")
 trans = load("transition.csv")
 daytype = load("daytype.csv")
+try:
+    kpi_level = load("kpi_level.csv")
+except Exception:
+    kpi_level = None
 
 # ── 사이드바 ②: 메뉴 ────────────────────────────────────────
 with st.sidebar:
@@ -164,6 +168,27 @@ def fig_kpi():
     f.add_hline(y=0, line_dash="dot", line_color="#bbb")
     f.update_xaxes(type="category")
     return base_layout(f, ttl="MAU vs DAU 전년비 추이")
+
+
+def fig_kpi_level():
+    d = kpi_level
+    xlab = [str(m)[2:] for m in d["month"]]
+    f = go.Figure()
+    f.add_trace(go.Scatter(x=xlab, y=d["mau"], name="MAU (좌)", mode="lines+markers",
+                           line=dict(color="#55A868", width=3)))
+    f.add_trace(go.Scatter(x=xlab, y=d["dau"], name="DAU (우)", mode="lines+markers",
+                           line=dict(color="#C44E52", width=3), yaxis="y2"))
+    f.update_layout(height=300, margin=dict(l=10, r=10, t=36, b=34),
+                    font=dict(family=KFONT), plot_bgcolor="white",
+                    legend=dict(orientation="h", y=-0.2, x=0),
+                    xaxis=dict(type="category"),
+                    yaxis=dict(title="MAU", gridcolor="#eee", rangemode="tozero"),
+                    yaxis2=dict(title="DAU", overlaying="y", side="right",
+                                showgrid=False, rangemode="tozero"),
+                    title=dict(text="MAU · DAU 실제 지표 추이", x=0.5, xanchor="center",
+                               y=0.98, yanchor="top",
+                               font=dict(family=KFONT, size=13, color="#1a2236")))
+    return f
 
 
 def fig_daytype():
@@ -237,6 +262,11 @@ def render_evidence(f):
     key = f"ev_{f['num']}"
     if ev == "kpi":
         st.plotly_chart(fig_kpi(), use_container_width=True, key=key)
+    elif ev == "kpi_level":
+        if kpi_level is not None:
+            st.plotly_chart(fig_kpi_level(), use_container_width=True, key=key)
+        else:
+            st.plotly_chart(fig_kpi(), use_container_width=True, key=key)
     elif ev == "daytype":
         st.plotly_chart(fig_daytype(), use_container_width=True, key=key)
     elif ev == "channel":
