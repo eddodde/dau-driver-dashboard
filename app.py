@@ -128,7 +128,7 @@ def base_layout(fig, h=260, ttl=None):
                       legend=dict(orientation="h", y=-0.2, x=0, font=dict(size=11)),
                       yaxis=dict(ticksuffix="%", gridcolor="#eee", zeroline=False))
     if ttl:
-        fig.update_layout(title=dict(text=ttl, x=0.01, xanchor="left", y=0.98, yanchor="top",
+        fig.update_layout(title=dict(text=ttl, x=0.5, xanchor="center", y=0.97, yanchor="top",
                                      font=dict(family=KFONT, size=13, color="#1a2236")))
     return fig
 
