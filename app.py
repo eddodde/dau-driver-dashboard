@@ -122,11 +122,14 @@ with st.sidebar:
     )
 
 
-def base_layout(fig, h=260):
-    fig.update_layout(height=h, margin=dict(l=10, r=10, t=28, b=10),
+def base_layout(fig, h=260, ttl=None):
+    fig.update_layout(height=h, margin=dict(l=10, r=10, t=(36 if ttl else 22), b=34),
                       font=dict(family=KFONT), plot_bgcolor="white",
-                      legend=dict(orientation="h", y=1.15, x=0),
+                      legend=dict(orientation="h", y=-0.2, x=0, font=dict(size=11)),
                       yaxis=dict(ticksuffix="%", gridcolor="#eee", zeroline=False))
+    if ttl:
+        fig.update_layout(title=dict(text=ttl, x=0.01, xanchor="left", y=0.98, yanchor="top",
+                                     font=dict(family=KFONT, size=13, color="#1a2236")))
     return fig
 
 
@@ -140,14 +143,15 @@ def fig_kpi():
                            mode="lines+markers", line=dict(color="#C44E52", width=3)))
     f.add_hline(y=0, line_dash="dot", line_color="#bbb")
     f.update_xaxes(type="category")
-    return base_layout(f)
+    return base_layout(f, ttl="MAU vs DAU 전년비 추이")
 
 
 def fig_daytype():
     f = go.Figure(go.Bar(x=daytype["type"], y=daytype["yoy"], marker_color="#2C5F8A",
                          text=[f"{v:+.1f}%" for v in daytype["yoy"]], textposition="outside"))
     f.add_hline(y=0, line_color="#bbb")
-    return base_layout(f)
+    f.update_layout(showlegend=False)
+    return base_layout(f, ttl="일자유형별 DAU 전년비")
 
 
 def fig_channel():
@@ -155,7 +159,8 @@ def fig_channel():
     f = go.Figure(go.Bar(x=channel["channel"], y=channel["yoy"], marker_color=colc,
                          text=[f"{v:+.0f}%" for v in channel["yoy"]], textposition="outside"))
     f.add_hline(y=0, line_color="#bbb")
-    return base_layout(f)
+    f.update_layout(showlegend=False)
+    return base_layout(f, ttl="채널별 DAU 전년비")
 
 
 def fig_freq():
@@ -163,7 +168,7 @@ def fig_freq():
     f.add_trace(go.Bar(name="2025", x=freq["group"], y=freq["y2025"], marker_color="#B0C4DE"))
     f.add_trace(go.Bar(name="2026", x=freq["group"], y=freq["y2026"], marker_color="#2C5F8A"))
     f.update_layout(barmode="group")
-    return base_layout(f)
+    return base_layout(f, ttl="빈도 구성비 (2025 → 2026)")
 
 
 def html_transition():
@@ -219,7 +224,6 @@ def render_evidence(f):
     elif ev == "freq_transition":
         a, b = st.columns(2)
         with a:
-            st.markdown('<span class="sub">빈도 구성비 (2025 → 2026)</span>', unsafe_allow_html=True)
             st.plotly_chart(fig_freq(), use_container_width=True, key=key + "_f")
         with b:
             st.markdown('<span class="sub">전이행렬 (행 합계 100%)</span>', unsafe_allow_html=True)
@@ -256,13 +260,10 @@ metric(c2, f"MAU 전년비 ({last['month']})", f"{last['mau_yoy']:+.1f}%", "모�
 metric(c3, "MAU − DAU 갭", f"{last['mau_yoy'] - last['dau_yoy']:+.1f}%p", "모수 아닌 '빈도' 문제", "#2C5F8A")
 g1, g2, g3 = st.columns(3)
 with g1:
-    st.markdown('<div class="ctitle">MAU vs DAU 전년비 추이</div>', unsafe_allow_html=True)
     st.plotly_chart(fig_kpi(), use_container_width=True, key="now_kpi")
 with g2:
-    st.markdown('<div class="ctitle">채널별 DAU 전년비</div>', unsafe_allow_html=True)
     st.plotly_chart(fig_channel(), use_container_width=True, key="now_ch")
 with g3:
-    st.markdown('<div class="ctitle">빈도 구성비 (2025 → 2026)</div>', unsafe_allow_html=True)
     st.plotly_chart(fig_freq(), use_container_width=True, key="now_fq")
 st.markdown('<div class="note">광고 <b>flat</b> · 하락 전액 '
             '<b style="color:#C44E52">직접·푸시</b> → 재방문 축에서 발생.</div>',
