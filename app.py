@@ -283,8 +283,8 @@ with g2:
     st.plotly_chart(fig_channel(), use_container_width=True, key="now_ch")
 with g3:
     st.plotly_chart(fig_freq(), use_container_width=True, key="now_fq")
-st.markdown('<div class="note">광고 <b>flat</b> · 하락 전액 '
-            '<b style="color:#C44E52">직접·푸시</b> → 재방문 축에서 발생.</div>',
+st.markdown('<div class="note">광고 <b style="color:#2C5F8A">+4%</b>(신규 유입 유지) · 하락은 '
+            '<b style="color:#C44E52">직접 −11% · 푸시 −14%</b>(재방문 채널) → 재방문 축에서 발생.</div>',
             unsafe_allow_html=True)
 
 # ── 2. 요인 점검 ────────────────────────────────────────────
