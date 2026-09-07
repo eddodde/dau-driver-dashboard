@@ -51,6 +51,7 @@ table.tree td.driver.bad { border-left:3px solid #C44E52; }
 table.tree td.driver.warn { border-left:3px solid #DD9A16; }
 table.tree td.act.on { background:#eef4ff; color:#2C5F8A; font-weight:600; }
 .sub { font-size:11px; color:#888; font-weight:400; }
+.ctitle { font-size:14px; font-weight:700; color:#1a2236; margin:0 0 4px; }
 .chip { font-size:10px; font-weight:700; border-radius:4px; padding:1px 6px; margin-left:4px; white-space:nowrap; }
 .chip.crm { background:#E1F5EE; color:#0F6E56; }
 .chip.out { background:#F1EFE8; color:#5F5E5A; }
@@ -255,13 +256,13 @@ metric(c2, f"MAU 전년비 ({last['month']})", f"{last['mau_yoy']:+.1f}%", "모�
 metric(c3, "MAU − DAU 갭", f"{last['mau_yoy'] - last['dau_yoy']:+.1f}%p", "모수 아닌 '빈도' 문제", "#2C5F8A")
 g1, g2, g3 = st.columns(3)
 with g1:
-    st.markdown('<span class="sub">MAU vs DAU 전년비 추이</span>', unsafe_allow_html=True)
+    st.markdown('<div class="ctitle">MAU vs DAU 전년비 추이</div>', unsafe_allow_html=True)
     st.plotly_chart(fig_kpi(), use_container_width=True, key="now_kpi")
 with g2:
-    st.markdown('<span class="sub">채널별 DAU 전년비</span>', unsafe_allow_html=True)
+    st.markdown('<div class="ctitle">채널별 DAU 전년비</div>', unsafe_allow_html=True)
     st.plotly_chart(fig_channel(), use_container_width=True, key="now_ch")
 with g3:
-    st.markdown('<span class="sub">빈도 구성비 (2025 → 2026)</span>', unsafe_allow_html=True)
+    st.markdown('<div class="ctitle">빈도 구성비 (2025 → 2026)</div>', unsafe_allow_html=True)
     st.plotly_chart(fig_freq(), use_container_width=True, key="now_fq")
 st.markdown('<div class="note">광고 <b>flat</b> · 하락 전액 '
             '<b style="color:#C44E52">직접·푸시</b> → 재방문 축에서 발생.</div>',
