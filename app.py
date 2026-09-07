@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 st.set_page_config(
-    page_title="VIP DAU 격주 보고",
+    page_title="VIP DAU 보고",
     page_icon="📋",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -13,31 +13,6 @@ st.set_page_config(
 
 DATA = pathlib.Path(__file__).parent / "data"
 KFONT = "'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif"
-
-
-with st.sidebar:
-    with st.expander("📁 데이터 업데이트 (CSV 업로드)"):
-        st.caption("갱신할 파일을 **파일명 그대로** 올리면 화면이 그 데이터로 바뀝니다. "
-                   "(kpi.csv · channel.csv · frequency.csv · transition.csv · nodes.csv · factors.csv · daytype.csv)")
-        _ups = st.file_uploader("CSV 올리기", type="csv", accept_multiple_files=True,
-                                label_visibility="collapsed")
-    uploaded = {u.name: u for u in (_ups or [])}
-    if uploaded:
-        st.success("업로드 반영: " + ", ".join(uploaded.keys()))
-
-def load(name, fill=False):
-    src = uploaded[name] if name in uploaded else (DATA / name)
-    df = pd.read_csv(src)
-    return df.fillna("") if fill else df
-
-
-nodes = load("nodes.csv", fill=True)
-factors = load("factors.csv", fill=True)
-kpi = load("kpi.csv")
-channel = load("channel.csv")
-freq = load("frequency.csv")
-trans = load("transition.csv")
-daytype = load("daytype.csv")
 
 st.markdown(
     """
@@ -106,6 +81,44 @@ def metric(col, label, value, sub, color):
 
 def title(text, anchor):
     st.markdown(f'<div class="section-title" id="{anchor}">{text}</div>', unsafe_allow_html=True)
+
+
+# ── 사이드바: 목차 + (최하단) 데이터 업로드 ──────────────────
+with st.sidebar:
+    st.markdown("### 목차")
+    toc = [
+        '<div class="navgroup first">보고</div>',
+        '<a class="tocsub" href="#now">1) 현황</a>',
+        '<a class="tocsub" href="#factors">2) 요인 점검</a>',
+        '<a class="tocsub" href="#map">3) 동인맵 · 실행</a>',
+    ]
+    st.markdown("\n".join(toc), unsafe_allow_html=True)
+    st.markdown("---")
+    st.caption("**요인 추가**: `factors.csv`에 행만 추가하면 점검이 늘어납니다.")
+    st.markdown('<div style="height:40vh"></div>', unsafe_allow_html=True)
+    with st.expander("📁 데이터 업데이트 (CSV 업로드)"):
+        st.caption("갱신할 파일을 **파일명 그대로** 올리면 화면이 그 데이터로 바뀝니다. "
+                   "(kpi.csv · channel.csv · frequency.csv · transition.csv · nodes.csv · factors.csv · daytype.csv)")
+        _ups = st.file_uploader("CSV 올리기", type="csv", accept_multiple_files=True,
+                                label_visibility="collapsed")
+    uploaded = {u.name: u for u in (_ups or [])}
+    if uploaded:
+        st.success("업로드 반영: " + ", ".join(uploaded.keys()))
+
+
+def load(name, fill=False):
+    src = uploaded[name] if name in uploaded else (DATA / name)
+    df = pd.read_csv(src)
+    return df.fillna("") if fill else df
+
+
+nodes = load("nodes.csv", fill=True)
+factors = load("factors.csv", fill=True)
+kpi = load("kpi.csv")
+channel = load("channel.csv")
+freq = load("frequency.csv")
+trans = load("transition.csv")
+daytype = load("daytype.csv")
 
 
 def base_layout(fig, h=280):
@@ -227,24 +240,7 @@ def render_evidence(f):
         st.caption("정량 근거 없음 — CRM 통제 밖으로 분석 범위에서 제외.")
 
 
-# ── 사이드바: 목차 ──────────────────────────────────────────
-with st.sidebar:
-    st.markdown("### 목차")
-    toc = [
-        '<div class="navgroup first">보고</div>',
-        '<a class="tocsub" href="#now">1) 현황</a>',
-        '<a class="tocsub" href="#factors">2) 요인 점검</a>',
-        '<a class="tocsub" href="#map">3) 동인맵 · 실행</a>',
-    ]
-    st.markdown("\n".join(toc), unsafe_allow_html=True)
-    st.markdown("---")
-    st.caption(
-        "**격주 갱신**: `data/kpi.csv`(DAU·MAU 전년비) · `channel.csv` · `frequency.csv` · "
-        "`transition.csv` 를 최신 실데이터로 교체하면 현황이 자동 갱신됩니다.\n\n"
-        "**요인 추가**: `factors.csv`에 행만 추가."
-    )
-
-st.markdown('<div class="hdr">VIP DAU 격주 보고</div>', unsafe_allow_html=True)
+st.markdown('<div class="hdr">VIP DAU 보고</div>', unsafe_allow_html=True)
 st.caption("현황 → 요인 점검 → 동인맵·실행  |  수치는 전년비·구성비, 절대수 비노출")
 
 # ── 1. 현황 ─────────────────────────────────────────────────
@@ -320,5 +316,5 @@ st.markdown('<table class="stbl"><tr><th>구분</th><th>내용</th></tr>' + erow
             unsafe_allow_html=True)
 
 st.markdown("---")
-st.caption("데이터: `data/*.csv` · 수치는 전년비·구성비(절대수 비노출) · "
-           "DAU 정의는 한 기준으로 통일 후 사용 권장.")
+st.caption("데이터: `data/*.csv` (사이드바 최하단에서 CSV 업로드로 교체 가능) · "
+           "수치는 전년비·구성비(절대수 비노출) · DAU 정의는 한 기준으로 통일 후 사용 권장.")
