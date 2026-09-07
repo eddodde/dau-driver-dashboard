@@ -158,6 +158,9 @@ def fig_kpi():
                            mode="lines+markers", line=dict(color="#55A868", width=3)))
     f.add_trace(go.Scatter(x=xlab, y=d["dau_yoy"], name="DAU 전년비",
                            mode="lines+markers", line=dict(color="#C44E52", width=3)))
+    if "stick_yoy" in d.columns:
+        f.add_trace(go.Scatter(x=xlab, y=d["stick_yoy"], name="Stickiness(DAU/MAU) 전년비",
+                               mode="lines+markers", line=dict(color="#7B61FF", width=2.5, dash="dot")))
     f.add_hline(y=0, line_dash="dot", line_color="#bbb")
     f.update_xaxes(type="category")
     return base_layout(f, ttl="MAU vs DAU 전년비 추이")
