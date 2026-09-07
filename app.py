@@ -258,6 +258,7 @@ c1, c2, c3 = st.columns(3)
 metric(c1, f"DAU 전년비 ({last['month']})", f"{last['dau_yoy']:+.1f}%", "방문 빈도 역신장", "#C44E52")
 metric(c2, f"MAU 전년비 ({last['month']})", f"{last['mau_yoy']:+.1f}%", "모수는 유지·증가", "#55A868")
 metric(c3, "MAU − DAU 갭", f"{last['mau_yoy'] - last['dau_yoy']:+.1f}%p", "모수 아닌 '빈도' 문제", "#2C5F8A")
+st.markdown('<div style="height:26px"></div>', unsafe_allow_html=True)
 g1, g2, g3 = st.columns(3)
 with g1:
     st.plotly_chart(fig_kpi(), use_container_width=True, key="now_kpi")
