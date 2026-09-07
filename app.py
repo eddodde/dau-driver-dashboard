@@ -182,9 +182,8 @@ def fig_kpi_level():
                     font=dict(family=KFONT), plot_bgcolor="white",
                     legend=dict(orientation="h", y=-0.2, x=0),
                     xaxis=dict(type="category"),
-                    yaxis=dict(title="MAU", gridcolor="#eee", rangemode="tozero"),
-                    yaxis2=dict(title="DAU", overlaying="y", side="right",
-                                showgrid=False, rangemode="tozero"),
+                    yaxis=dict(title="MAU", gridcolor="#eee"),
+                    yaxis2=dict(title="DAU", overlaying="y", side="right", showgrid=False),
                     title=dict(text="MAU · DAU 실제 지표 추이", x=0.5, xanchor="center",
                                y=0.98, yanchor="top",
                                font=dict(family=KFONT, size=13, color="#1a2236")))
