@@ -121,7 +121,7 @@ with st.sidebar:
     )
 
 
-def base_layout(fig, h=280):
+def base_layout(fig, h=260):
     fig.update_layout(height=h, margin=dict(l=10, r=10, t=28, b=10),
                       font=dict(family=KFONT), plot_bgcolor="white",
                       legend=dict(orientation="h", y=1.15, x=0),
@@ -131,13 +131,15 @@ def base_layout(fig, h=280):
 
 def fig_kpi():
     d = kpi
+    xlab = [str(m)[2:] for m in d["month"]]
     f = go.Figure()
-    f.add_trace(go.Scatter(x=d["month"], y=d["mau_yoy"], name="MAU 전년비",
+    f.add_trace(go.Scatter(x=xlab, y=d["mau_yoy"], name="MAU 전년비",
                            mode="lines+markers", line=dict(color="#55A868", width=3)))
-    f.add_trace(go.Scatter(x=d["month"], y=d["dau_yoy"], name="DAU 전년비",
+    f.add_trace(go.Scatter(x=xlab, y=d["dau_yoy"], name="DAU 전년비",
                            mode="lines+markers", line=dict(color="#C44E52", width=3)))
     f.add_hline(y=0, line_dash="dot", line_color="#bbb")
-    return base_layout(f, 300)
+    f.update_xaxes(type="category")
+    return base_layout(f)
 
 
 def fig_daytype():
@@ -251,19 +253,19 @@ c1, c2, c3 = st.columns(3)
 metric(c1, f"DAU 전년비 ({last['month']})", f"{last['dau_yoy']:+.1f}%", "방문 빈도 역신장", "#C44E52")
 metric(c2, f"MAU 전년비 ({last['month']})", f"{last['mau_yoy']:+.1f}%", "모수는 유지·증가", "#55A868")
 metric(c3, "MAU − DAU 갭", f"{last['mau_yoy'] - last['dau_yoy']:+.1f}%p", "모수 아닌 '빈도' 문제", "#2C5F8A")
-st.markdown('<span class="sub">MAU vs DAU 전년비 추이</span>', unsafe_allow_html=True)
-st.plotly_chart(fig_kpi(), use_container_width=True, key="now_kpi")
-
-ca, cb = st.columns(2)
-with ca:
+g1, g2, g3 = st.columns(3)
+with g1:
+    st.markdown('<span class="sub">MAU vs DAU 전년비 추이</span>', unsafe_allow_html=True)
+    st.plotly_chart(fig_kpi(), use_container_width=True, key="now_kpi")
+with g2:
     st.markdown('<span class="sub">채널별 DAU 전년비</span>', unsafe_allow_html=True)
     st.plotly_chart(fig_channel(), use_container_width=True, key="now_ch")
-    st.markdown('<div class="note">광고 <b>flat</b> · 하락 전액 '
-                '<b style="color:#C44E52">직접·푸시</b> → 재방문 축에서 발생.</div>',
-                unsafe_allow_html=True)
-with cb:
+with g3:
     st.markdown('<span class="sub">빈도 구성비 (2025 → 2026)</span>', unsafe_allow_html=True)
     st.plotly_chart(fig_freq(), use_container_width=True, key="now_fq")
+st.markdown('<div class="note">광고 <b>flat</b> · 하락 전액 '
+            '<b style="color:#C44E52">직접·푸시</b> → 재방문 축에서 발생.</div>',
+            unsafe_allow_html=True)
 
 # ── 2. 요인 점검 ────────────────────────────────────────────
 title("2. 요인 점검", "factors")
