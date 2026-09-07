@@ -19,37 +19,37 @@ st.markdown(
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
 html, body, [class*="css"] { font-family: 'Noto Sans KR','Malgun Gothic',sans-serif; }
-.hdr { font-size: 26px; font-weight: 700; color:#1a1a2e; margin-bottom: 2px; }
-.section-title { font-size:18px; font-weight:700; color:#1a1a2e; margin:24px 0 10px;
-  padding-bottom:6px; border-bottom:2px solid #e9ecef; scroll-margin-top:20px; }
-.metric-card { background:#f8f9fa; border-radius:10px; padding:12px 16px; border-left:4px solid #4C72B0; }
+.hdr { font-size: 26px; font-weight: 700; color:#1a2236; margin-bottom: 2px; }
+.section-title { font-size:18px; font-weight:700; color:#1a2236; margin:24px 0 10px;
+  padding-bottom:6px; border-bottom:2px solid #e7ebf2; scroll-margin-top:20px; }
+.metric-card { background:#f8f9fa; border-radius:10px; padding:12px 16px; border-left:4px solid #2C5F8A; }
 .metric-label { font-size:13px; color:#666; margin-bottom:4px; }
-.metric-value { font-size:24px; font-weight:700; color:#1a1a2e; }
+.metric-value { font-size:24px; font-weight:700; color:#1a2236; }
 .metric-sub { font-size:12px; color:#888; margin-top:2px; }
 .note { font-size:13px; color:#555; background:#f6f7f9; border-radius:8px; padding:10px 14px; }
 .fac-q { font-size:12px; color:#888; }
-.fac-c { font-size:14px; color:#1a1a2e; }
+.fac-c { font-size:14px; color:#1a2236; }
 .badge { font-size:12px; font-weight:700; border-radius:6px; padding:3px 10px; white-space:nowrap; }
-.navgroup { font-size:13px; font-weight:700; color:#1a1a2e; margin:14px 0 4px; }
-.navgroup.first { margin-top:0; }
-a.tocsub { display:block; padding:3px 0 3px 14px; color:#2E68B0; font-size:14px; text-decoration:underline; }
-a.tocsub:hover { color:#163E78; }
+a.navlink { display:block; padding:7px 12px; margin:3px 0; border-radius:8px;
+  background:#eef3f9; color:#2C5F8A; text-decoration:none; font-size:14px;
+  font-weight:600; border:1px solid #dde7f2; }
+a.navlink:hover { background:#e0ebf7; color:#1d4666; }
 table.stbl { border-collapse:collapse; width:100%; background:#fff; }
 table.stbl th { background:#eef1f6; color:#55606f; font-size:12px; font-weight:700; padding:8px 10px;
   border:1px solid #e3e9f2; text-align:left; }
-table.stbl td { border:1px solid #e3e9f2; padding:8px 10px; font-size:13px; color:#1a1a2e; vertical-align:middle; }
+table.stbl td { border:1px solid #e3e9f2; padding:8px 10px; font-size:13px; color:#1a2236; vertical-align:middle; }
 table.stbl td.fn { font-weight:700; white-space:nowrap; }
 table.stbl td.fc { color:#444; }
 table.tree { border-collapse:collapse; width:100%; background:#fff; }
 table.tree th { background:#eef1f6; color:#55606f; font-size:12px; font-weight:700; padding:8px;
   border:1px solid #e3e9f2; text-align:center; }
-table.tree td { border:1px solid #e3e9f2; padding:8px 10px; font-size:13px; color:#1a1a2e; vertical-align:middle; }
-table.tree td.root { background:#eef4ff; color:#2E68B0; font-weight:700; text-align:center; }
+table.tree td { border:1px solid #e3e9f2; padding:8px 10px; font-size:13px; color:#1a2236; vertical-align:middle; }
+table.tree td.root { background:#eef4ff; color:#2C5F8A; font-weight:700; text-align:center; }
 table.tree td.axis { background:#f6f7f9; font-weight:600; text-align:center; }
 table.tree td.axiskey { background:#efeafb; font-weight:600; text-align:center; }
 table.tree td.driver.bad { border-left:3px solid #C44E52; }
 table.tree td.driver.warn { border-left:3px solid #DD9A16; }
-table.tree td.act.on { background:#eef4ff; color:#2E68B0; font-weight:600; }
+table.tree td.act.on { background:#eef4ff; color:#2C5F8A; font-weight:600; }
 .sub { font-size:11px; color:#888; font-weight:400; }
 .chip { font-size:10px; font-weight:700; border-radius:4px; padding:1px 6px; margin-left:4px; white-space:nowrap; }
 .chip.crm { background:#E1F5EE; color:#0F6E56; }
@@ -83,24 +83,14 @@ def title(text, anchor):
     st.markdown(f'<div class="section-title" id="{anchor}">{text}</div>', unsafe_allow_html=True)
 
 
-# ── 사이드바: 목차 + (최하단) 데이터 업로드 ──────────────────
+# ── 사이드바 ①: 설정 (원본 올리기) ──────────────────────────
 with st.sidebar:
-    st.markdown("### 목차")
-    toc = [
-        '<div class="navgroup first">보고</div>',
-        '<a class="tocsub" href="#now">1) 현황</a>',
-        '<a class="tocsub" href="#factors">2) 요인 점검</a>',
-        '<a class="tocsub" href="#map">3) 동인맵 · 실행</a>',
-    ]
-    st.markdown("\n".join(toc), unsafe_allow_html=True)
-    st.markdown("---")
-    st.caption("**요인 추가**: `factors.csv`에 행만 추가하면 점검이 늘어납니다.")
-    st.markdown('<div style="height:40vh"></div>', unsafe_allow_html=True)
-    with st.expander("📁 데이터 업데이트 (CSV 업로드)"):
-        st.caption("갱신할 파일을 **파일명 그대로** 올리면 화면이 그 데이터로 바뀝니다. "
-                   "(kpi.csv · channel.csv · frequency.csv · transition.csv · nodes.csv · factors.csv · daytype.csv)")
+    st.header("⚙️ 설정")
+    with st.expander("📤 원본 올리기 (월 갱신)", expanded=False):
+        st.caption("갱신할 CSV를 **파일명 그대로** 올리면 git push 없이 즉시 반영됩니다. "
+                   "(kpi · channel · frequency · transition · nodes · factors · daytype .csv)")
         _ups = st.file_uploader("CSV 올리기", type="csv", accept_multiple_files=True,
-                                label_visibility="collapsed")
+                                label_visibility="collapsed", key="up")
     uploaded = {u.name: u for u in (_ups or [])}
     if uploaded:
         st.success("업로드 반영: " + ", ".join(uploaded.keys()))
@@ -120,6 +110,29 @@ freq = load("frequency.csv")
 trans = load("transition.csv")
 daytype = load("daytype.csv")
 
+# ── 사이드바 ②: 메뉴 + 기간 ─────────────────────────────────
+YMS = [str(m) for m in kpi["month"]]
+with st.sidebar:
+    st.markdown("#### 📂 메뉴")
+    with st.expander("📋 실적 보고", expanded=True):
+        st.markdown(
+            '<a href="#now" class="navlink">1 · 현황</a>'
+            '<a href="#factors" class="navlink">2 · 요인 점검</a>'
+            '<a href="#map" class="navlink">3 · 동인맵 · 실행</a>',
+            unsafe_allow_html=True,
+        )
+    st.markdown("#### 🔎 기간")
+    if len(YMS) >= 2:
+        ym0, ym1 = st.select_slider("기간(월)", options=YMS, value=(YMS[0], YMS[-1]),
+                                    format_func=lambda m: m[2:], key=f"period_{YMS[0]}_{YMS[-1]}")
+    else:
+        ym0, ym1 = (YMS[0], YMS[-1]) if YMS else ("", "")
+    src_txt = "업로드 CSV" if uploaded else "커밋된 data/*.csv"
+    st.caption(f"데이터 출처: **{src_txt}** · {len(YMS)}개월")
+    st.caption("수치는 전년비·구성비 · 절대수 비노출")
+
+kpi_view = kpi[(kpi["month"] >= ym0) & (kpi["month"] <= ym1)] if ym0 else kpi
+
 
 def base_layout(fig, h=280):
     fig.update_layout(height=h, margin=dict(l=10, r=10, t=28, b=10),
@@ -130,17 +143,18 @@ def base_layout(fig, h=280):
 
 
 def fig_kpi():
+    d = kpi_view if len(kpi_view) else kpi
     f = go.Figure()
-    f.add_trace(go.Scatter(x=kpi["month"], y=kpi["mau_yoy"], name="MAU 전년비",
+    f.add_trace(go.Scatter(x=d["month"], y=d["mau_yoy"], name="MAU 전년비",
                            mode="lines+markers", line=dict(color="#55A868", width=3)))
-    f.add_trace(go.Scatter(x=kpi["month"], y=kpi["dau_yoy"], name="DAU 전년비",
+    f.add_trace(go.Scatter(x=d["month"], y=d["dau_yoy"], name="DAU 전년비",
                            mode="lines+markers", line=dict(color="#C44E52", width=3)))
     f.add_hline(y=0, line_dash="dot", line_color="#bbb")
     return base_layout(f, 300)
 
 
 def fig_daytype():
-    f = go.Figure(go.Bar(x=daytype["type"], y=daytype["yoy"], marker_color="#4C72B0",
+    f = go.Figure(go.Bar(x=daytype["type"], y=daytype["yoy"], marker_color="#2C5F8A",
                          text=[f"{v:+.1f}%" for v in daytype["yoy"]], textposition="outside"))
     f.add_hline(y=0, line_color="#bbb")
     return base_layout(f)
@@ -157,7 +171,7 @@ def fig_channel():
 def fig_freq():
     f = go.Figure()
     f.add_trace(go.Bar(name="2025", x=freq["group"], y=freq["y2025"], marker_color="#B0C4DE"))
-    f.add_trace(go.Bar(name="2026", x=freq["group"], y=freq["y2026"], marker_color="#4C72B0"))
+    f.add_trace(go.Bar(name="2026", x=freq["group"], y=freq["y2026"], marker_color="#2C5F8A"))
     f.update_layout(barmode="group")
     return base_layout(f)
 
@@ -230,7 +244,7 @@ def render_evidence(f):
             '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;'
             'background:#f8f9fa;border-radius:10px;padding:12px 16px">'
             f'<span style="font-size:13px;color:#666">{f["cmp_label"]}</span>'
-            f'<span style="font-size:20px;font-weight:700;color:#1a1a2e">'
+            f'<span style="font-size:20px;font-weight:700;color:#1a2236">'
             f'{v25:g}{unit} <span style="color:#bbb">→</span> {v26:g}{unit}</span>'
             f'<span class="badge" style="background:{dcolor}22;color:{dcolor}">'
             f'전년비 {delta:+.1f}{dsuf}</span></div>',
@@ -241,15 +255,16 @@ def render_evidence(f):
 
 
 st.markdown('<div class="hdr">VIP DAU 보고</div>', unsafe_allow_html=True)
-st.caption("현황 → 요인 점검 → 동인맵·실행  |  수치는 전년비·구성비, 절대수 비노출")
+lab = f"{ym0[2:]} ~ {ym1[2:]}" if ym0 else "-"
+st.caption(f"현황 → 요인 점검 → 동인맵·실행  |  기간 {lab} · 수치는 전년비·구성비, 절대수 비노출")
 
 # ── 1. 현황 ─────────────────────────────────────────────────
 title("1. 현황", "now")
-last = kpi.iloc[-1]
+last = (kpi_view if len(kpi_view) else kpi).iloc[-1]
 c1, c2, c3 = st.columns(3)
 metric(c1, f"DAU 전년비 ({last['month']})", f"{last['dau_yoy']:+.1f}%", "방문 빈도 역신장", "#C44E52")
 metric(c2, f"MAU 전년비 ({last['month']})", f"{last['mau_yoy']:+.1f}%", "모수는 유지·증가", "#55A868")
-metric(c3, "MAU − DAU 갭", f"{last['mau_yoy'] - last['dau_yoy']:+.1f}%p", "모수 아닌 '빈도' 문제", "#4C72B0")
+metric(c3, "MAU − DAU 갭", f"{last['mau_yoy'] - last['dau_yoy']:+.1f}%p", "모수 아닌 '빈도' 문제", "#2C5F8A")
 st.markdown('<span class="sub">MAU vs DAU 전년비 추이</span>', unsafe_allow_html=True)
 st.plotly_chart(fig_kpi(), use_container_width=True, key="now_kpi")
 
@@ -316,5 +331,5 @@ st.markdown('<table class="stbl"><tr><th>구분</th><th>내용</th></tr>' + erow
             unsafe_allow_html=True)
 
 st.markdown("---")
-st.caption("데이터: `data/*.csv` (사이드바 최하단에서 CSV 업로드로 교체 가능) · "
+st.caption("데이터: `data/*.csv` (사이드바 설정에서 CSV 업로드로 교체 가능) · "
            "수치는 전년비·구성비(절대수 비노출) · DAU 정의는 한 기준으로 통일 후 사용 권장.")
