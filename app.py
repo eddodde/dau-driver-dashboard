@@ -5,8 +5,8 @@ import plotly.graph_objects as go
 import streamlit as st
 
 st.set_page_config(
-    page_title="VIP DAU 진단 · 동인맵",
-    page_icon="🔎",
+    page_title="VIP DAU 격주 보고",
+    page_icon="📋",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -41,20 +41,19 @@ html, body, [class*="css"] { font-family: 'Noto Sans KR','Malgun Gothic',sans-se
 .metric-value { font-size:24px; font-weight:700; color:#1a1a2e; }
 .metric-sub { font-size:12px; color:#888; margin-top:2px; }
 .note { font-size:13px; color:#555; background:#f6f7f9; border-radius:8px; padding:10px 14px; }
-.fac-q { font-size:12px; color:#888; margin:2px 0 6px; }
+.fac-q { font-size:12px; color:#888; }
 .fac-c { font-size:14px; color:#1a1a2e; }
 .badge { font-size:12px; font-weight:700; border-radius:6px; padding:3px 10px; white-space:nowrap; }
+.navgroup { font-size:13px; font-weight:700; color:#1a1a2e; margin:14px 0 4px; }
+.navgroup.first { margin-top:0; }
+a.tocsub { display:block; padding:3px 0 3px 14px; color:#2E68B0; font-size:14px; text-decoration:underline; }
+a.tocsub:hover { color:#163E78; }
 table.stbl { border-collapse:collapse; width:100%; background:#fff; }
 table.stbl th { background:#eef1f6; color:#55606f; font-size:12px; font-weight:700; padding:8px 10px;
   border:1px solid #e3e9f2; text-align:left; }
 table.stbl td { border:1px solid #e3e9f2; padding:8px 10px; font-size:13px; color:#1a1a2e; vertical-align:middle; }
 table.stbl td.fn { font-weight:700; white-space:nowrap; }
 table.stbl td.fc { color:#444; }
-.anchor { scroll-margin-top: 20px; }
-.navgroup { font-size:13px; font-weight:700; color:#1a1a2e; margin:14px 0 4px; }
-.navgroup.first { margin-top:0; }
-a.tocsub { display:block; padding:3px 0 3px 14px; color:#2E68B0; font-size:14px; text-decoration:underline; }
-a.tocsub:hover { color:#163E78; }
 table.tree { border-collapse:collapse; width:100%; background:#fff; }
 table.tree th { background:#eef1f6; color:#55606f; font-size:12px; font-weight:700; padding:8px;
   border:1px solid #e3e9f2; text-align:center; }
@@ -80,13 +79,8 @@ table.mtx td.up { background:#EAF3DE; color:#173404; }
     unsafe_allow_html=True,
 )
 
-VERDICT = {
-    "제외": "#9aa0a6",
-    "유효": "#C44E52",
-    "부분 유효": "#DD9A16",
-    "범위 제외": "#6c8ebf",
-    "보류": "#7f8c8d",
-}
+VERDICT = {"제외": "#9aa0a6", "유효": "#C44E52", "부분 유효": "#DD9A16",
+           "범위 제외": "#6c8ebf", "보류": "#7f8c8d"}
 
 
 def metric(col, label, value, sub, color):
@@ -141,7 +135,7 @@ def fig_freq():
     f.add_trace(go.Bar(name="2025", x=freq["group"], y=freq["y2025"], marker_color="#B0C4DE"))
     f.add_trace(go.Bar(name="2026", x=freq["group"], y=freq["y2026"], marker_color="#4C72B0"))
     f.update_layout(barmode="group")
-    return base_layout(f, 300)
+    return base_layout(f)
 
 
 def html_transition():
@@ -226,32 +220,49 @@ def render_evidence(f):
 with st.sidebar:
     st.markdown("### 목차")
     toc = [
-        '<div class="navgroup first">진단</div>',
-        '<a class="tocsub" href="#status">1) 점검 현황</a>',
-        '<a class="tocsub" href="#factors">2) 요인별 점검</a>',
-        '<div class="navgroup">결론·실행</div>',
-        '<a class="tocsub" href="#map">3) 동인맵</a>',
+        '<div class="navgroup first">보고</div>',
+        '<a class="tocsub" href="#now">1) 현황</a>',
+        '<a class="tocsub" href="#factors">2) 요인 점검</a>',
+        '<a class="tocsub" href="#map">3) 동인맵 · 실행</a>',
     ]
     st.markdown("\n".join(toc), unsafe_allow_html=True)
     st.markdown("---")
     st.caption(
-        "**워싱**: 모든 숫자는 `data/*.csv`에서 로드. 기준 통일·마스킹은 CSV만 수정.\n\n"
-        "**요인 추가**: `factors.csv`에 행만 추가하면 점검 카드가 늘어남."
+        "**격주 갱신**: `data/kpi.csv`(DAU·MAU 전년비) · `channel.csv` · `frequency.csv` · "
+        "`transition.csv` 를 최신 실데이터로 교체하면 현황이 자동 갱신됩니다.\n\n"
+        "**요인 추가**: `factors.csv`에 행만 추가."
     )
 
-st.markdown('<div class="hdr">VIP DAU 진단 · 동인맵</div>', unsafe_allow_html=True)
-st.caption("하락 현상을 요인별로 점검(진단) → 통제 가능한 실행으로 수렴(동인맵) | "
-           "수치는 전년비·구성비, 절대수 비노출")
+st.markdown('<div class="hdr">VIP DAU 격주 보고</div>', unsafe_allow_html=True)
+st.caption("현황 → 요인 점검 → 동인맵·실행  |  수치는 전년비·구성비, 절대수 비노출")
 
-# ── 점검 현황 ───────────────────────────────────────────────
-title("점검 현황", "status")
+# ── 1. 현황 ─────────────────────────────────────────────────
+title("1. 현황", "now")
+last = kpi.iloc[-1]
+c1, c2, c3 = st.columns(3)
+metric(c1, f"DAU 전년비 ({last['month']})", f"{last['dau_yoy']:+.1f}%", "방문 빈도 역신장", "#C44E52")
+metric(c2, f"MAU 전년비 ({last['month']})", f"{last['mau_yoy']:+.1f}%", "모수는 유지·증가", "#55A868")
+metric(c3, "MAU − DAU 갭", f"{last['mau_yoy'] - last['dau_yoy']:+.1f}%p", "모수 아닌 '빈도' 문제", "#4C72B0")
+st.markdown('<span class="sub">MAU vs DAU 전년비 추이</span>', unsafe_allow_html=True)
+st.plotly_chart(fig_kpi(), use_container_width=True, key="now_kpi")
+
+ca, cb = st.columns(2)
+with ca:
+    st.markdown('<span class="sub">채널별 DAU 전년비</span>', unsafe_allow_html=True)
+    st.plotly_chart(fig_channel(), use_container_width=True, key="now_ch")
+    st.markdown('<div class="note">광고 <b>flat</b> · 하락 전액 '
+                '<b style="color:#C44E52">직접·푸시</b> → 재방문 축에서 발생.</div>',
+                unsafe_allow_html=True)
+with cb:
+    st.markdown('<span class="sub">빈도 구성비 (2025 → 2026)</span>', unsafe_allow_html=True)
+    st.plotly_chart(fig_freq(), use_container_width=True, key="now_fq")
+
+# ── 2. 요인 점검 ────────────────────────────────────────────
+title("2. 요인 점검", "factors")
 counts = factors["verdict"].value_counts()
 cols = st.columns(4)
 for col, label in zip(cols, ["제외", "유효", "부분 유효", "범위 제외"]):
     metric(col, label, f"{int(counts.get(label, 0))}건", "", VERDICT[label])
-
-# ── 요인별 점검 ─────────────────────────────────────────────
-title("요인별 점검", "factors")
 st.caption("후보 요인 전체 판정을 한눈에 확인하고, 아래에서 하나를 골라 근거 데이터를 확인.")
 
 srows = []
@@ -279,21 +290,23 @@ with st.container(border=True):
     )
     render_evidence(f)
 
-# ── 동인맵 (결론) ───────────────────────────────────────────
-title("동인맵 (결론)", "map")
+# ── 3. 동인맵 · 실행 ────────────────────────────────────────
+title("3. 동인맵 · 실행", "map")
 st.markdown('<span class="sub">VIP DAU = 방문 모수 × 인당 방문빈도 · '
             'CRM 통제 가능(teal) / CRM 밖(gray)</span>', unsafe_allow_html=True)
 st.markdown(render_tree(nodes), unsafe_allow_html=True)
 
-last = kpi.iloc[-1]
-c1, c2, c3 = st.columns(3)
-metric(c1, f"MAU 전년비 ({last['month']})", f"{last['mau_yoy']:+.1f}%", "모수는 유지·증가", "#55A868")
-metric(c2, f"DAU 전년비 ({last['month']})", f"{last['dau_yoy']:+.1f}%", "방문 빈도 역신장", "#C44E52")
-metric(c3, "MAU − DAU 갭", f"{last['mau_yoy'] - last['dau_yoy']:+.1f}%p", "모수 아닌 '빈도' 문제", "#4C72B0")
-
-st.markdown('<div class="note">채널 분해: 광고 <b>flat</b> · 하락 전액 '
-            '<b style="color:#C44E52">직접 −10% · 푸시 −14%</b>(재방문 채널) '
-            '→ 하락은 <b>인당 빈도(재방문) 축</b>에서 발생.</div>', unsafe_allow_html=True)
+st.markdown('<div style="height:12px"></div>', unsafe_allow_html=True)
+st.markdown('<span class="sub">실행 계획</span>', unsafe_allow_html=True)
+exec_rows = [
+    ("단일 레버", "재방문 트리거 — D-1 발송 → 행동 발생 즉시 발송 전환 (근거: W컨셉 등 벤치마크, 자사 A/B 검증)"),
+    ("트랙 A / B", "A = 실시간 행동 트리거(본 레버) · B = 미보유 재설치(즉시 착수)"),
+    ("목표", "반등 아닌 '역신장 폭 축소' — 보수 −8% / 기본 −5% / 상한 −2.5%"),
+    ("측정", "발송군 vs 홀드아웃(대조군) 재방문율 차이로 순효과 검증 (4주)"),
+]
+erows = "".join(f'<tr><td class="fn">{k}</td><td class="fc">{v}</td></tr>' for k, v in exec_rows)
+st.markdown('<table class="stbl"><tr><th>구분</th><th>내용</th></tr>' + erows + "</table>",
+            unsafe_allow_html=True)
 
 st.markdown("---")
 st.caption("데이터: `data/*.csv` · 수치는 전년비·구성비(절대수 비노출) · "
