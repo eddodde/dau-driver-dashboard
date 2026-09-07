@@ -114,13 +114,12 @@ daytype = load("daytype.csv")
 YMS = [str(m) for m in kpi["month"]]
 with st.sidebar:
     st.markdown("#### 📂 메뉴")
-    with st.expander("📋 실적 보고", expanded=True):
-        st.markdown(
-            '<a href="#now" class="navlink">1 · 현황</a>'
-            '<a href="#factors" class="navlink">2 · 요인 점검</a>'
-            '<a href="#map" class="navlink">3 · 동인맵 · 실행</a>',
-            unsafe_allow_html=True,
-        )
+    st.markdown(
+        '<a href="#now" class="navlink">1 · 현황</a>'
+        '<a href="#factors" class="navlink">2 · 요인 점검</a>'
+        '<a href="#map" class="navlink">3 · 동인맵 · 실행</a>',
+        unsafe_allow_html=True,
+    )
     st.markdown("#### 🔎 기간")
     if len(YMS) >= 2:
         ym0, ym1 = st.select_slider("기간(월)", options=YMS, value=(YMS[0], YMS[-1]),
